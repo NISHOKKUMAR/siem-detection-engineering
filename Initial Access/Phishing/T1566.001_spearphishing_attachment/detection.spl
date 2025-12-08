@@ -1,0 +1,8 @@
+index=email_logs sourcetype="email"
+| eval suspicious_url=if(
+    like(url, "%bit.ly%") OR
+    like(url, "%tinyurl%") OR
+    like(url, "%.top%") 
+)
+| where suspicious_url=1 NOT sender IN ("yourcompany.com","trustedvendor.com")
+| stats count by sender, recipient, subject, url, message_id
