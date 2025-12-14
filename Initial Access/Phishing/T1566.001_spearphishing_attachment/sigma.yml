@@ -1,0 +1,35 @@
+title: Spearphishing Attachment – High Risk File Types
+id: a3c4c607-92de-4e8d-8b6b-90e8a4a2e91d
+status: stable
+description: Detects emails containing high-risk attachment types commonly used in spearphishing attacks.
+author: Dexter
+logsource:
+  product: email
+detection:
+  selection:
+    event.action: "received"
+    attachment.file_extension:
+      - hta
+      - js
+      - jse
+      - vbs
+      - ps1
+      - psm1
+      - exe
+      - dll
+      - scr
+      - zip
+      - rar
+      - docm
+      - xlsm
+      - pptm
+  filter:
+    email.from.domain:
+      - internal.local
+      - trustedpartner.com
+  condition: selection and not filter
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1566.001
+  - attack.spearphishing
