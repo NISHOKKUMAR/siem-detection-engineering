@@ -1,4 +1,0 @@
-index=web_logs sourcetype=proxy_logs OR sourcetype=firewall_logs
-| regex url="(?i)\.(xyz|top|online|club|gq)$"  # Detects suspicious TLDs at the end of the domain
-| stats count by _time, src_ip, dest_ip, url, user_agent
-| sort - count
