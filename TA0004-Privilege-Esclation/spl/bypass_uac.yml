@@ -1,0 +1,14 @@
+index=sysmon OR index=edr OR index=windows
+| search process_name IN ("fodhelper.exe","eventvwr.exe","computerdefaults.exe","sdclt.exe","cmstp.exe","dllhost.exe","slui.exe")
+| search parent_process_name IN ("cmd.exe","powershell.exe","wscript.exe","cscript.exe")
+| where IntegrityLevel!="System" AND IntegrityLevel!="High"
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine, IntegrityLevel
+| sort - _time
+
+
+// Registry hijacking path monitoring
+
+index=sysmon OR index=windows
+| search EventCode=13 OR event_type="RegistryEvent"
+| search registry_key="HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\*"
+| stats count BY _time, host, user, registry_key, registry_value_data, process_name, parent_process_name

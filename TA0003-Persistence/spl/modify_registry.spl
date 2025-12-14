@@ -1,0 +1,13 @@
+index=sysmon OR index=winregistry OR index=edr
+| where event_type="RegistryEvent" OR EventCode=13
+| search (registry_key IN (
+    "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*",
+    "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce*",
+    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce*",
+    "HKLM\\SYSTEM\\CurrentControlSet\\Services*",
+    "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon*"
+  ))
+| search registry_value_data!="C:\\Windows\\system32\\*" 
+| stats count BY _time, host, user, process_name, parent_process_name, registry_key, registry_value, registry_value_data
+| sort - _time

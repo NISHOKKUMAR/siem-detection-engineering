@@ -1,0 +1,28 @@
+// File Access to Sensitive Data
+
+index=sysmon OR index=edr
+| search EventCode IN (10, 11, 12, 13, 14)
+| regex TargetFilename="(?i)(Users|Documents|Desktop|Downloads|AppData|ProgramData)"
+| regex TargetFilename="(?i)\.(docx?|xlsx?|pptx?|pdf|csv|txt|zip|rar|7z|pst|ost|db)$"
+| search TargetFilename!="*\\Windows\\*" AND TargetFilename!="*\\Program Files\\*"  # Exclude system directories
+| stats count BY _time, host, user, process_name, TargetFilename, event_type
+| sort - _time
+| where host!="localhost" AND host!="127.0.0.1"  # Exclude local system artifacts
+
+
+// Collection via Command-Line Utilities
+
+index=sysmon OR index=edr
+| search process_name IN ("powershell.exe","cmd.exe","robocopy.exe","xcopy.exe","tar.exe","7z.exe")
+| search CommandLine IN ("*copy*","*robocopy*","*xcopy*","*Compress-Archive*","*tar -c*")
+| regex CommandLine="(?i)(Users|Documents|Desktop|Downloads)"
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine
+| sort - _time
+
+
+// PowerShell-Based Collection (LOLBins)
+
+index=sysmon OR index=edr
+| search process_name="powershell.exe"
+| search CommandLine IN ("*Get-ChildItem*","*Select-String*","*Compress-Archive*","*Out-File*")
+| stats count BY _time, host, user, CommandLine

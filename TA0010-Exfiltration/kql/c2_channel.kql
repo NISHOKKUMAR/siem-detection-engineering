@@ -1,0 +1,29 @@
+# Suspicious High-Volume Outbound Traffic to External Hosts
+
+event.category : "network" and
+network.direction : "outbound" and
+destination.ip : * and
+not destination.ip : (
+  "10.0.0.0/8" or "172.16.0.0/12" or "192.168.0.0/16"
+) and
+network.bytes_out > 5000000
+
+
+# DNS-Based Exfiltration
+
+event.category : "network" and
+network.protocol : "dns" and
+dns.question.name : * and
+string.length(dns.question.name) > 50
+
+
+# Process-Correlated Exfiltration
+
+event.category : "network" and
+network.direction : "outbound" and
+process.name : (
+  "powershell.exe" or "cmd.exe" or
+  "python.exe" or "curl.exe" or
+  "wget.exe" or "rclone.exe"
+) and
+network.bytes_out > 1000000

@@ -1,0 +1,11 @@
+event.category : "registry" and
+registry.action : ("modification" or "setValue") and
+registry.key : (
+  "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*" or
+  "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*" or
+  "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce*" or
+  "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce*" or
+  "HKLM\\SYSTEM\\CurrentControlSet\\Services*" or
+  "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon*"
+) and
+not process.name : ("explorer.exe" or "svchost.exe" or "userinit.exe")

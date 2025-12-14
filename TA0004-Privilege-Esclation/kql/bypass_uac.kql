@@ -1,0 +1,13 @@
+event.category : "process" and
+process.name : ("fodhelper.exe" or "eventvwr.exe" or "computerdefaults.exe" or "sdclt.exe" or "cmstp.exe" or "dllhost.exe" or "slui.exe") and
+process.parent.name : ("cmd.exe" or "powershell.exe" or "wscript.exe" or "cscript.exe") and
+not user.name : ("SYSTEM" or "NT AUTHORITY\\SYSTEM")
+
+
+# Registry hijack detection (UAC proxy registry keys)
+
+event.category : "registry" and
+registry.key : (
+  "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\*"
+) and
+registry.action : ("modification" or "creation")

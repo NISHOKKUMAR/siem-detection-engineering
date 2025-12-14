@@ -1,0 +1,32 @@
+# File Access from Sensitive Locations
+
+event.category : "file" and
+event.action : ("open" or "read" or "copy" or "create") and
+file.path : (
+  "*\\Users\\*" or
+  "*\\Documents\\*" or
+  "*\\Desktop\\*" or
+  "*\\Downloads\\*" or
+  "*\\AppData\\*" or
+  "*\\ProgramData\\*"
+) and
+file.extension : (
+  "doc" or "docx" or "xls" or "xlsx" or "ppt" or "pptx" or
+  "pdf" or "csv" or "txt" or
+  "zip" or "rar" or "7z" or
+  "pst" or "ost" or "db"
+)
+
+
+# Collection via Command-Line Utilities
+
+event.category : "process" and
+process.name : (
+  "powershell.exe" or "cmd.exe" or
+  "robocopy.exe" or "xcopy.exe" or
+  "tar.exe" or "7z.exe"
+) and
+process.args : (
+  "*\\Users\\*" or "*\\Documents\\*" or "*\\Desktop\\*" or
+  "*copy*" or "*robocopy*" or "*Compress-Archive*" or "*tar -c*"
+)

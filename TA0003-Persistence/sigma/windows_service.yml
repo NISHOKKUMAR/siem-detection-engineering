@@ -1,0 +1,46 @@
+title: Windows Service Creation or Modification for Persistence (T1543.003)
+id: 1c5e3f1c-8fb1-4af7-8ba8-987d85b91543
+status: experimental
+description: Detects creation or modification of Windows services for persistence or privilege escalation.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1543/003/
+tags:
+  - attack.persistence
+  - attack.t1543.003
+  - windows
+  - service
+
+logsource:
+  product: windows
+  category: service
+
+detection:
+  creation:
+    EventID: 7045
+
+  suspicious_binaries:
+    ImagePath|contains:
+      - ".exe"
+      - ".bat"
+      - ".cmd"
+      - ".ps1"
+      - "\\Users\\Public\\"
+      - "Temp\\"
+      - "\\AppData\\"
+      - "\\Downloads\\"
+
+  condition: creation and suspicious_binaries
+
+falsepositives:
+  - authorized enterprise software deployment
+  - legitimate antivirus / system agent installation
+
+level: high
+
+fields:
+  - ServiceName
+  - ImagePath
+  - User
+  - CommandLine
+  - Computer

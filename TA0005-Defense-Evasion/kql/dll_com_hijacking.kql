@@ -1,0 +1,7 @@
+event.category : "process" and
+process.name : ("rundll32.exe" or "regsvr32.exe" or "dllhost.exe" or "powershell.exe" or "wmic.exe") and
+process.args : ("*.dll") and
+process.args : (
+  "*\\Users\\*" or "*\\AppData\\*" or "*\\Temp\\*" or "*\\Downloads\\*" or "*\\Public\\*" or "*\\ProgramData\\*"
+) and
+not process.args : ("C:\\Windows\\System32\\*" or "C:\\Windows\\SysWOW64\\*")

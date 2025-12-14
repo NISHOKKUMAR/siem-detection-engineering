@@ -1,0 +1,10 @@
+event.category : "process" and
+process.name : ("schtasks.exe" or "powershell.exe" or "cmd.exe" or "at.exe") and
+process.args : (
+  "* /create*" or
+  "* /change*" or
+  "* /tn *" or
+  "*New-ScheduledTask*" or
+  "*Register-ScheduledTask*"
+) and
+not process.args : ("*Windows Defender*" or "*MSSQLSERVER*")

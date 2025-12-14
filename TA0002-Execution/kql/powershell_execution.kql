@@ -1,0 +1,12 @@
+process.name : "powershell.exe" and
+process.args : (
+  "*-enc*" or "*-encodedcommand*" or
+  "*-nop*" or "*-noprofile*" or
+  "*-w hidden*" or "*-window hidden*" or
+  "*-exec bypass*" or "*-executionpolicy bypass*" or
+  "*IEX *" or "*invoke-expression*" or
+  "*DownloadString*" or "*DownloadFile*"
+) and
+not process.args : (
+  "*Defender*" or "*Microsoft.PowerShell.Management*"
+)

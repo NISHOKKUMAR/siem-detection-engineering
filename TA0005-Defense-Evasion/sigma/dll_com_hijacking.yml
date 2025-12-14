@@ -1,0 +1,49 @@
+title: Suspicious DLL Loading from User Controlled Paths (T1574.001)
+id: c8cda0c1-b4bb-4fd1-9c46-5c9a11171574
+status: experimental
+description: Detects DLL/COM hijacking behavior where DLLs load from non-standard paths such as user-writable locations.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1574/001/
+tags:
+  - attack.defense_evasion
+  - attack.t1574.001
+  - dll-hijack
+  - com-hijack
+
+logsource:
+  product: windows
+  category: image_load
+
+detection:
+  user_paths:
+    ImageLoaded|contains:
+      - "\\Users\\"
+      - "\\AppData\\"
+      - "\\Temp\\"
+      - "\\ProgramData\\"
+      - "\\Public\\"
+      - "\\Downloads\\"
+
+  suspicious_processes:
+    Image|endswith:
+      - "\\rundll32.exe"
+      - "\\regsvr32.exe"
+      - "\\dllhost.exe"
+
+  condition: suspicious_processes and user_paths
+
+falsepositives:
+  - software installers
+  - legitimate development activity
+
+level: high
+
+fields:
+  - Image
+  - ImageLoaded
+  - User
+  - ProcessId
+  - IntegrityLevel
+  - SignatureStatus
+  - Computer

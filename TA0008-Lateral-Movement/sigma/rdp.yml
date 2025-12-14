@@ -1,0 +1,35 @@
+title: Remote Desktop Logon from Remote System (T1021.001)
+id: 6e0e6f6d-5a1b-4c59-bd19-1b7a6b9f1021
+status: experimental
+description: Detects Remote Desktop Protocol (RDP) logons which may indicate lateral movement.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1021/001/
+tags:
+  - attack.lateral_movement
+  - attack.t1021.001
+  - rdp
+
+logsource:
+  product: windows
+  service: security
+
+detection:
+  selection:
+    EventID: 4624
+    LogonType: 10
+
+  condition: selection
+
+falsepositives:
+  - Legitimate administrative access
+  - Helpdesk or IT operations
+
+level: medium
+
+fields:
+  - TargetUserName
+  - IpAddress
+  - WorkstationName
+  - LogonType
+  - Computer

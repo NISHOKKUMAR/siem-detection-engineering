@@ -1,0 +1,43 @@
+title: SMB Admin Share Access for Lateral Movement (T1021.002)
+id: 1f5e1a3c-9d84-4e3f-8f9a-1021002smb
+status: experimental
+description: Detects lateral movement via SMB using Windows administrative shares such as ADMIN$, C$, or IPC$.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1021/002/
+tags:
+  - attack.lateral_movement
+  - attack.t1021.002
+  - smb
+
+logsource:
+  product: windows
+  service: security
+
+detection:
+  smb_logon:
+    EventID: 4624
+    LogonType: 3
+
+  admin_share:
+    EventID: 5140
+    ShareName|contains:
+      - "ADMIN$"
+      - "C$"
+      - "IPC$"
+
+  condition: smb_logon and admin_share
+
+falsepositives:
+  - Legitimate IT administration
+  - Patch management tools
+  - Backup software
+
+level: high
+
+fields:
+  - SubjectUserName
+  - TargetUserName
+  - IpAddress
+  - ShareName
+  - Computer

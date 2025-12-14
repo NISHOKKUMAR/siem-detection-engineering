@@ -1,0 +1,25 @@
+// Powershell Enumeration
+
+index=windows or index=sysmom
+EventCode IN (1, 4688) 
+| search process_name IN ("cmd.exe","powershell.exe","pwsh.exe","powershell_ise.exe")
+| search CommandLine IN ("*dir*","*find*","*tree*","*where*","*Get-ChildItem*","*Get-Item*")
+| regex CommandLine="(?i)(Users|ProgramData|AppData|Windows|Desktop|Documents|Temp)"
+| where NOT parent_process_name IN ("explorer.exe","cmd.exe","powershell.exe","pwsh.exe","winlogon.exe")
+| where NOT user IN ("Administrator","admin","DOMAIN\\ITAdmins","SYSTEM","LOCAL SERVICE","NETWORK SERVICE")
+| where NOT match(host, "(mgmt|backup|monitor|jump|admin)")
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine
+| sort - _time
+
+
+// Linux Enumeration
+
+index=linux OR index=syslog
+| search process_name IN ("bash","sh","zsh")
+| search CommandLine IN ("*ls*","*find*","*tree*","*grep*")
+| regex CommandLine="(?i)(home|etc|var|tmp)"
+| where NOT parent_process_name IN ("sshd", "bash", "zsh", "sh", "systemd", "login", "sudo")
+| where NOT user IN ("root", "admin", "ec2-user", "ubuntu", "centos")
+| where NOT match(host, "backup|monitor|mgmt")
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine
+| sort - _time

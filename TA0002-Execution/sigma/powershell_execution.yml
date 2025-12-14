@@ -1,0 +1,50 @@
+title: Suspicious PowerShell Execution (T1059.001)
+id: 51f2f41b-2527-4c8b-9f3f-b0180d1c1059
+status: experimental
+description: Detects suspicious PowerShell execution often used by adversaries for execution, payload execution, and obfuscation.
+author: Dexter
+date: 2025/08/12
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - powershell
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+  selection:
+    Image|endswith: '\powershell.exe'
+
+  suspicious_flags:
+    CommandLine|contains:
+      - "-enc"
+      - "-encodedcommand"
+      - "-nop"
+      - "-noprofile"
+      - "-w hidden"
+      - "-window hidden"
+      - "-exec bypass"
+      - "-executionpolicy bypass"
+      - "DownloadString"
+      - "DownloadFile"
+      - "IEX "
+      - "Invoke-Expression"
+      - "Invoke-WebRequest"
+      - "FromBase64String"
+
+  condition: selection and suspicious_flags
+
+falsepositives:
+  - Legitimate IT automation scripts (should be allowlisted)
+  - Software deployment tools
+
+level: high
+
+fields:
+  - CommandLine
+  - Image
+  - ParentImage
+  - User

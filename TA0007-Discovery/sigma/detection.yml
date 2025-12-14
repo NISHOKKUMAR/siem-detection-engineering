@@ -1,0 +1,83 @@
+title: Suspicious File and Directory Discovery (T1083)
+id: d01fa9b4-8a64-4c41-8b04-78a001221083
+status: experimental
+description: Detects potentially suspicious directory enumeration commonly used in discovery phases, excluding known benign interactive usage.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1083/
+
+tags:
+  - attack.discovery
+  - attack.t1083
+  - file-discovery
+
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+
+  # ------- CMD enumeration -------
+  cmd_enumeration:
+    Image|endswith: "\\cmd.exe"
+    CommandLine|contains:
+      - "dir "
+      - "tree "
+      - "where "
+      - "find "
+
+  # ------- PowerShell enumeration -------
+  pwsh_enumeration:
+    Image|endswith:
+      - "\\powershell.exe"
+      - "\\pwsh.exe"
+    CommandLine|contains:
+      - "Get-ChildItem"
+      - "Get-Item"
+      - "gci "
+
+  # ------- Targeting sensitive directories -------
+  sensitive_paths:
+    CommandLine|contains:
+      - "\\Users"
+      - "\\AppData"
+      - "\\ProgramData"
+      - "\\Documents"
+      - "Admin$"
+      - "C:\\"
+
+  # ------- Exclude normal parent processes -------
+  benign_parents:
+    ParentImage|endswith:
+      - "\\explorer.exe"
+      - "\\cmd.exe"
+      - "\\powershell.exe"
+      - "\\pwsh.exe"
+
+  # ------- Exclude common admin/automation accounts -------
+  benign_users:
+    User|contains:
+      - "Administrator"
+      - "admin"
+      - "svc_"
+      - "SYSTEM"
+
+  condition: >
+    (cmd_enumeration or pwsh_enumeration)
+    and sensitive_paths
+    and not benign_parents
+    and not benign_users
+
+falsepositives:
+  - Admin or IT maintenance scripts
+  - Backup and management tools
+  - Legitimate user directory browsing
+
+level: medium
+
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User
+  - Computer

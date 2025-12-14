@@ -1,0 +1,24 @@
+# Successful SMB Logons
+
+index=windows OR index=wineventlog
+| search EventCode=4624 LogonType=3
+| stats count BY _time, host, TargetUserName, IpAddress, WorkstationName
+| sort - _time
+
+
+# Access to ADMIN$ / C$ / IPC$
+
+index=windows OR index=wineventlog
+| search EventCode=5140
+| search ShareName="*\\ADMIN$" OR ShareName="*\\C$" OR ShareName="*\\IPC$"
+| stats count BY _time, host, SubjectUserName, IpAddress, ShareName
+| sort - _time
+
+
+# PsExec / SMB-based Remote Execution
+
+index=sysmon OR index=edr
+| search process_name IN ("psexec.exe","psexesvc.exe","sc.exe")
+| search CommandLine="*\\\\*" OR CommandLine="*ADMIN$*" OR CommandLine="*C$*"
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine
+| sort - _time

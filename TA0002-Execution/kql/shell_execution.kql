@@ -1,0 +1,8 @@
+process.name : ("bash" or "sh" or "zsh" or "dash") and
+process.args : (
+  "*curl*" or "*wget*" or
+  "*bash -c*" or "*sh -c*" or
+  "*chmod +x*" or "*| bash*" or "*| sh*" or
+  "*rm -rf*" or "*sudo*" or "*nc*" or "*bash -i*"
+) and
+not user.name : ("root" or "admin") 

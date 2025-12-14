@@ -1,0 +1,58 @@
+title: Suspicious Inbound Email Containing Phishing Link (T1566.002)
+id: 32af2a83-0888-4ac3-9e9b-a09c1c7c1566
+status: experimental
+description: Detects inbound email with suspicious URL links commonly used in spearphishing campaigns.
+author: Dexter
+date: 2025/07/12
+references:
+  - https://attack.mitre.org/techniques/T1566/002/
+tags:
+  - attack.initial_access
+  - attack.t1566.002
+  - phishing
+logsource:
+  product: o365
+  service: exchange
+
+detection:
+  selection:
+    EmailDirection: Inbound
+    EventAction: Received
+  url_presence:
+    UrlCount: ">0"
+  suspicious_tlds:
+    UrlDomain|endswith:
+      - ".xyz"
+      - ".top"
+      - ".click"
+      - ".online"
+      - ".live"
+      - ".shop"
+      - ".ru"
+      - ".work"
+      - ".buzz"
+  phishing_themes:
+    Subject|contains:
+      - invoice
+      - urgent
+      - payment
+      - payroll
+      - confirm
+      - password
+      - resume
+      - delivery
+  condition: selection and url_presence and suspicious_tlds and phishing_themes
+
+falsepositives:
+  - legitimate newsletters
+  - marketing campaigns
+  - vendors using new domains
+
+level: high
+
+fields:
+  - Sender
+  - Recipient
+  - Subject
+  - UrlDomain
+  - Url

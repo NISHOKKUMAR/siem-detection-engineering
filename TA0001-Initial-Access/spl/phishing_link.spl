@@ -1,0 +1,8 @@
+index=email OR index=o365
+| search event.action="received" AND email.direction="inbound"
+| where email.url.total_count >= 1
+| search email.url.domain IN ("*.xyz","*.top","*.click","*.online","*.live","*.shop","*.ru","*.buzz","*.work")
+| search email.subject IN ("*invoice*","*urgent*","*payment*","*delivery*","*resume*","*password*","*confirm*","*payroll*")
+| stats count BY _time, email.to.address, email.from.address, email.subject, email.url.domain, email.url
+| where count >= 1
+| sort - _time

@@ -1,0 +1,20 @@
+# Failed RDP Attempts (Credential Guessing + Lateral Move)
+
+event.dataset : "windows.security" and
+event.code : "4625" and
+winlog.event_data.LogonType : "10"
+
+
+# Successful RDP Logons
+
+event.dataset : "windows.security" and
+event.code : "4624" and
+winlog.event_data.LogonType : "10" and
+not winlog.event_data.TargetUserName : ("Administrator" or "admin")
+
+# RDP Client Execution 
+
+event.category : "process" and
+process.name : "mstsc.exe" and
+not user.name : ("ITAdmin" or "helpdesk")
+

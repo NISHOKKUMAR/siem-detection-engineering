@@ -1,0 +1,50 @@
+title: Suspicious Scheduled Task Creation or Modification (T1053.005)
+id: c64a29bb-72c4-4ee7-a0aa-921e677b1053
+status: experimental
+description: Detects scheduled task creation or modification often used for persistence by adversaries.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1053/005/
+tags:
+  - attack.persistence
+  - attack.t1053.005
+  - windows
+
+logsource:
+  product: windows
+  category: task_scheduler
+
+detection:
+  events:
+    EventID:
+      - 4698   # task created
+      - 4702   # task updated
+      - 4699   # deleted
+      - 4701   # disabled
+      - 4700   # enabled
+
+  suspicious_paths:
+    Command|contains:
+      - ".exe"
+      - ".bat"
+      - ".cmd"
+      - ".ps1"
+      - "\\Users\\Public\\"
+      - "\\AppData\\"
+      - "\\Temp\\"
+      - "\\Downloads\\"
+
+  condition: events and suspicious_paths
+
+falsepositives:
+  - corporate patching automation
+  - system maintenance tasks
+
+level: high
+
+fields:
+  - TaskName
+  - Command
+  - UserID
+  - Computer
+  - EventID

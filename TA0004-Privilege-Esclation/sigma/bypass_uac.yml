@@ -1,0 +1,50 @@
+title: UAC Bypass via Auto-Elevating Binaries
+id: d3c75d87-3622-4ce4-9bd2-ffe4518e1548
+status: experimental
+description: Detects execution of known Windows UAC bypass helper binaries launched from user-level processes.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1548/002/
+tags:
+  - attack.privilege_escalation
+  - attack.t1548.002
+  - uac
+  - bypass
+
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+  selection_bypass_bins:
+    Image|endswith:
+      - "\\fodhelper.exe"
+      - "\\eventvwr.exe"
+      - "\\computerdefaults.exe"
+      - "\\sdclt.exe"
+      - "\\slui.exe"
+      - "\\dllhost.exe"
+      - "\\cmstp.exe"
+
+  suspicious_parent:
+    ParentImage|endswith:
+      - "\\cmd.exe"
+      - "\\powershell.exe"
+      - "\\wscript.exe"
+      - "\\cscript.exe"
+
+  condition: selection_bypass_bins and suspicious_parent
+
+falsepositives:
+  - legitimate accessibility or control panel usage
+  - IT automation scripts
+
+level: high
+
+fields:
+  - Image
+  - ParentImage
+  - User
+  - CommandLine
+  - IntegrityLevel
+  - Computer

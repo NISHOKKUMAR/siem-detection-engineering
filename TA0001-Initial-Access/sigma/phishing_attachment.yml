@@ -1,0 +1,59 @@
+title: Suspicious Inbound Email with Potentially Malicious Attachment (T1566.001)
+id: a1d1d5ab-3b0e-4aa7-b805-838be1ab6001
+status: experimental
+description: Detects spearphishing attempts delivered via executable or macro-enabled email attachments.
+author: Dexter
+date: 2025/06/12
+references:
+  - https://attack.mitre.org/techniques/T1566/001/
+tags:
+  - attack.initial_access
+  - attack.t1566.001
+  - phishing
+  - malware
+logsource:
+  product: o365
+  service: exchange
+
+detection:
+  selection:
+    EmailDirection: Inbound
+    EventAction: Received
+    AttachmentCount: ">0"
+
+  suspicious_extensions:
+    AttachmentExtension|endswith:
+      - ".exe"
+      - ".dll"
+      - ".scr"
+      - ".js"
+      - ".vbs"
+      - ".hta"
+      - ".cmd"
+      - ".bat"
+      - ".ps1"
+      - ".psm1"
+      - ".iso"
+      - ".img"
+      - ".zip"
+      - ".rar"
+      - ".7z"
+      - ".docm"
+      - ".xlsm"
+      - ".pptm"
+      - ".rtf"
+
+  condition: selection and suspicious_extensions
+
+falsepositives:
+  - internal testing distribution
+  - legitimate executables sent by IT using password-protected archives
+
+level: high
+
+fields:
+  - Sender
+  - Recipient
+  - Subject
+  - AttachmentName
+  - AttachmentExtension

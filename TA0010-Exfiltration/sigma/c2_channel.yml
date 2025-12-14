@@ -1,0 +1,29 @@
+title: Large Data Exfiltration Over Network (T1041)
+id: 3a2b1c4d-5e6f-4g7h-8i9j-0k1l2m3n4o5p  # Valid UUID
+status: experimental
+description: Detects large outbound data transfers (>5MB) potentially indicating exfiltration.
+author: Dexter (adapted)
+date: 2025-12-14
+references:
+  - https://attack.mitre.org/techniques/T1041/
+tags:
+  - attack.exfiltration
+  - attack.t1041
+logsource:
+  product: zeek
+  service: conn  
+detection:
+  selection:
+    orig_bytes|gt: 5000000  
+  condition: selection
+falsepositives:
+  - Legitimate large uploads (e.g., backups, file shares, updates)
+  - Cloud syncing tools
+level: high  
+fields:
+  - id.orig_h  
+  - id.resp_h  
+  - id.resp_p  
+  - orig_bytes
+  - resp_bytes
+  - proto

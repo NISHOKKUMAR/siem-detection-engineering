@@ -1,0 +1,53 @@
+title: Ingress Tool Transfer via Command Line or LOLBins (T1105)
+id: 9d9c0f2e-4c8a-4b9f-9e8a-1105ingress
+status: experimental
+description: Detects adversaries downloading tools or payloads from external systems using command-line utilities or PowerShell.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1105/
+tags:
+  - attack.command_and_control
+  - attack.t1105
+  - ingress-tool-transfer
+  - lolbins
+
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+  download_tools:
+    Image|endswith:
+      - "\\powershell.exe"
+      - "\\pwsh.exe"
+      - "\\cmd.exe"
+      - "\\curl.exe"
+      - "\\wget.exe"
+      - "\\certutil.exe"
+      - "\\bitsadmin.exe"
+
+  download_indicators:
+    CommandLine|contains:
+      - "http://"
+      - "https://"
+      - "Invoke-WebRequest"
+      - "DownloadString"
+      - "DownloadFile"
+      - "certutil -urlcache"
+      - "bitsadmin /transfer"
+
+  condition: download_tools and download_indicators
+
+falsepositives:
+  - legitimate software installers
+  - IT automation and patching tools
+  - package managers
+
+level: high
+
+fields:
+  - Image
+  - CommandLine
+  - User
+  - ParentImage
+  - Computer

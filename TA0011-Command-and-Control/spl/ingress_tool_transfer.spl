@@ -1,0 +1,20 @@
+// LOLBins Downloading External Payloads
+
+index=sysmon OR index=edr
+| search process_name IN ("powershell.exe","pwsh.exe","cmd.exe","curl.exe","wget.exe","certutil.exe","bitsadmin.exe")
+| search CommandLine IN (
+    "*http://*","*https://*",
+    "*Invoke-WebRequest*","*DownloadString*","*DownloadFile*",
+    "*certutil -urlcache*","*bitsadmin /transfer*"
+  )
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine
+| sort - _time
+
+
+// External Downloading
+
+index=network OR index=proxy
+| where bytes_in > 100000
+| search NOT dest_ip IN ("10.0.0.0/8","172.16.0.0/12","192.168.0.0/16")
+| stats sum(bytes_in) BY _time, src_ip, dest_ip, dest_domain, protocol
+| sort - bytes_in

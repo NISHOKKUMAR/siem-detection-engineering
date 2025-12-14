@@ -1,0 +1,47 @@
+title: Suspicious Registry Modification for Persistence (T1112)
+id: e82b3b3c-d7fd-4ab6-bf41-86f79b1e1112
+status: experimental
+description: Registry modification to auto-start locations commonly abused for persistence.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1112/
+tags:
+  - attack.persistence
+  - attack.t1112
+  - registry
+logsource:
+  product: windows
+  category: registry_event
+
+detection:
+  selection_keys:
+    TargetObject|startswith:
+      - "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+      - "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+      - "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+      - "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+      - "HKLM\\SYSTEM\\CurrentControlSet\\Services"
+      - "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon"
+
+  suspicious_data:
+    Details|contains:
+      - ".exe"
+      - ".dll"
+      - ".bat"
+      - ".ps1"
+
+  condition: selection_keys and suspicious_data
+
+falsepositives:
+  - software installations
+  - legitimate enterprise IT automation
+
+level: high
+
+fields:
+  - User
+  - TargetObject
+  - Details
+  - ProcessName
+  - Image
+  - ParentImage

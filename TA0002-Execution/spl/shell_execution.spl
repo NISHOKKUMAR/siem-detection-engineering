@@ -1,0 +1,15 @@
+index=linux OR index=syslog OR index=edr
+| search process_name IN ("bash","sh","zsh","dash")
+| search CommandLine IN (
+    "*curl *http*",
+    "*wget *http*",
+    "*bash -c*",
+    "*sh -c*",
+    "*chmod +x*",
+    "*| bash*",
+    "*| sh*",
+    "*nc *",
+    "*rm -rf*"
+  )
+| stats count BY _time, host, user, parent_process_name, process_name, CommandLine
+| sort - _time

@@ -1,0 +1,9 @@
+event.category : "process" and
+process.name : ("sc.exe" or "powershell.exe" or "cmd.exe") and
+process.args : (
+  "*sc create*" or "*sc config*" or
+  "*New-Service*" or
+  "*Set-Service*" or
+  "*InstallUtil*"
+) and
+not process.args : ("*Windows Defender*" or "*MSSQLSERVER*")

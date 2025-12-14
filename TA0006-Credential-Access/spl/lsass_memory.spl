@@ -1,0 +1,16 @@
+// Process Access to LSASS
+
+index=sysmon OR index=edr
+| search EventCode=10 TargetImage="*\\lsass.exe"
+| search GrantedAccess IN ("0x1fffff","0x1010","0x143a","0x1f3fff","0x1000","0x1f0fff")
+| search process_name!="taskmgr.exe" AND process_name!="lsass.exe" AND process_name!="csrss.exe"
+| stats count BY _time, host, user, process_name, parent_process_name, GrantedAccess, CallTrace
+| sort - _time
+
+
+// Detect LSASS dump file creation
+
+index=sysmon OR index=edr
+| search EventCode=11
+| regex TargetFilename="(?i)(lsass\.dmp|\\Temp\\.*\.dmp|\\Users\\.*\.dmp)"
+| stats count BY _time, host, user, process_name, TargetFilename

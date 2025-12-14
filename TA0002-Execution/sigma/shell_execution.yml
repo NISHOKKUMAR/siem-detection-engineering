@@ -1,0 +1,47 @@
+title: Suspicious Unix Shell Execution (T1059.004)
+id: f8d83c44-07e4-4922-8fb3-f4ee605d1059
+status: experimental
+description: Detects suspicious Unix Shell commands used by attackers for script execution or payload retrieval.
+author: Dexter
+tags:
+  - attack.execution
+  - attack.t1059.004
+logsource:
+  product: linux
+  category: process_creation
+
+detection:
+  selection_shells:
+    Image|endswith:
+      - "/bash"
+      - "/sh"
+      - "/zsh"
+      - "/dash"
+
+  suspicious_usage:
+    CommandLine|contains:
+      - "curl "
+      - "wget "
+      - "bash -c"
+      - "sh -c"
+      - "chmod +x"
+      - "| bash"
+      - "| sh"
+      - "nc "
+      - "rm -rf"
+
+  condition: selection_shells and suspicious_usage
+
+falsepositives:
+  - Admin automation
+  - DevOps scripts
+  - Security tools executing expected commands
+
+level: high
+
+fields:
+  - Image
+  - CommandLine
+  - User
+  - ParentImage
+  - Hostname

@@ -1,0 +1,27 @@
+# LOLBins Downloading External Payloads
+
+event.category : "process" and
+process.name : (
+  "powershell.exe" or "pwsh.exe" or
+  "cmd.exe" or
+  "curl.exe" or "wget.exe" or
+  "certutil.exe" or "bitsadmin.exe"
+) and
+process.args : (
+  "*http://*" or "*https://*" or
+  "*Invoke-WebRequest*" or "*iwr*" or
+  "*DownloadString*" or "*DownloadFile*" or
+  "*certutil -urlcache*" or
+  "*bitsadmin /transfer*"
+)
+
+
+# External Downloading
+
+event.category : "network" and
+network.direction : "outbound" and
+destination.ip : * and
+not destination.ip : (
+  "10.0.0.0/8" or "172.16.0.0/12" or "192.168.0.0/16"
+) and
+network.bytes_in > 100000

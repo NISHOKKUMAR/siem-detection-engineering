@@ -1,0 +1,6 @@
+(index=winsecurity OR index=sysmon OR index=edr)
+| search (EventCode=4697 OR EventCode=7045 OR EventCode=12 OR EventCode=13)
+| eval service_path = coalesce(Image, ServiceFileName, registry_value_data)
+| search service_path!="" AND service_path!="C:\\Windows\\System32\\*"
+| stats count BY _time, host, user, EventCode, ServiceName, service_path, process_name, parent_process_name
+| sort - _time

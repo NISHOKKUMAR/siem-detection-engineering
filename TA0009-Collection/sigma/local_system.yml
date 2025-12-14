@@ -1,0 +1,59 @@
+title: Data Collection from Local System (T1005)
+id: 3c6b9f9e-2c9b-4a2a-9f1a-8d2f7d451005
+status: experimental
+description: Detects suspicious access, copying, or archiving of local files commonly associated with data collection prior to exfiltration.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1005/
+tags:
+  - attack.collection
+  - attack.t1005
+  - data-collection
+
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+  suspicious_tools:
+    Image|endswith:
+      - "\\powershell.exe"
+      - "\\cmd.exe"
+      - "\\robocopy.exe"
+      - "\\xcopy.exe"
+      - "\\tar.exe"
+      - "\\7z.exe"
+
+  collection_commands:
+    CommandLine|contains:
+      - "Compress-Archive"
+      - "Get-ChildItem"
+      - "Select-String"
+      - "robocopy"
+      - "xcopy"
+      - "tar -c"
+      - "copy "
+
+  sensitive_paths:
+    CommandLine|contains:
+      - "\\Users\\"
+      - "\\Documents\\"
+      - "\\Desktop\\"
+      - "\\Downloads\\"
+      - "\\AppData\\"
+
+  condition: suspicious_tools and collection_commands and sensitive_paths
+
+falsepositives:
+  - Legitimate backup operations
+  - IT maintenance or migration scripts
+  - Endpoint protection scans
+
+level: medium
+
+fields:
+  - Image
+  - CommandLine
+  - User
+  - ParentImage
+  - Computer

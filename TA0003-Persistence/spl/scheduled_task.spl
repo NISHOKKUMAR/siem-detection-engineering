@@ -1,0 +1,13 @@
+(index=wineventlog OR index=sysmon OR index=edr)
+| search (EventCode=4698 OR EventCode=4702 OR EventCode=4699 OR EventCode=4700 OR EventCode=4701)
+| eval task_name=coalesce(TaskName, winlog.event_data.TaskName)
+| eval action = case(
+    EventCode=4698, "Task Created",
+    EventCode=4702, "Task Updated",
+    EventCode=4699, "Task Deleted",
+    EventCode=4700, "Task Enabled",
+    EventCode=4701, "Task Disabled"
+  )
+| search task_name!="\\Microsoft\\Windows\\Defrag*" AND task_name!="\\Microsoft\\Windows\\Update*"
+| stats count BY _time, host, user, action, task_name, Command, CommandLine
+| sort - _time

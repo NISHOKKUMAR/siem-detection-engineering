@@ -1,0 +1,27 @@
+# SMB Network Logons
+
+event.dataset : "windows.security" and
+event.code : "4624" and
+winlog.event_data.LogonType : "3" and
+winlog.event_data.AuthenticationPackageName : "NTLM" and
+not winlog.event_data.TargetUserName : ("ANONYMOUS LOGON")
+
+
+# Access to Admin Shares (ADMIN$, C$, IPC$)
+
+event.dataset : "windows.security" and
+event.code : "5140" and
+winlog.event_data.ShareName : (
+  "\\\\*\\ADMIN$" or
+  "\\\\*\\C$" or
+  "\\\\*\\IPC$"
+)
+
+
+# SMB Execution via PsExec / Service Creation
+
+event.category : "process" and
+process.name : ("psexec.exe" or "psexesvc.exe" or "sc.exe") and
+process.args : (
+  "*\\\\*" or "*ADMIN$*" or "*C$*"
+)

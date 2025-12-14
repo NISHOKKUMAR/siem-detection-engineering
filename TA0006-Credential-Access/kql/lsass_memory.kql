@@ -1,0 +1,24 @@
+# Process Access to LSASS
+
+event.action : "ProcessAccessed" and
+process_ext.target.process.name : "lsass.exe" and
+process_ext.access_mask_description : (
+  "*READ_CONTROL*" or "*WRITE_DAC*" or "*PROCESS_VM_READ*" or "*PROCESS_VM_WRITE*" or "*PROCESS_QUERY_INFORMATION*"
+) and
+not process.name : (
+  "csrss.exe",
+  "wininit.exe",
+  "winlogon.exe",
+  "lsass.exe",
+  "taskmgr.exe"
+)
+
+
+# Detect creation of suspicious LSASS dump file 
+
+event.category : "file" and
+file.name : ("lsass.dmp" or "*.dmp") and
+file.path : (
+  "*\\Users\\*" or "*\\Temp\\*" or "*\\Public\\*" or "*\\AppData\\*"
+)
+

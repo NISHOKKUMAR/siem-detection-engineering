@@ -1,0 +1,26 @@
+// Suspicious High-Volume Outbound Transfer to External IPs
+
+index=network OR index=proxy
+| where bytes_out > 5000000
+| search NOT dest_ip IN ("10.0.0.0/8","172.16.0.0/12","192.168.0.0/16")
+| stats sum(bytes_out) AS total_bytes BY _time, src_ip, dest_ip, dest_port, protocol
+| sort - total_bytes
+
+
+// DNS-Based Exfiltration
+
+index=dns
+| eval qlen=len(query)
+| where qlen > 50
+| stats count BY _time, src_ip, query
+| sort - _time
+
+
+// Process-Level Exfiltration (EDR Correlation)
+
+index=edr OR index=sysmon
+| search EventCode="3"
+| search process_name IN ("powershell.exe","cmd.exe","python.exe","curl.exe","wget.exe","rclone.exe")
+| where bytes_out > 1000000
+| stats sum(bytes_out) BY _time, host, user, process_name, dest_ip, dest_port
+| sort - bytes_out

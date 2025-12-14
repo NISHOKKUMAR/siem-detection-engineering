@@ -1,0 +1,22 @@
+// Failed RDP Logon
+
+index=windows OR index=wineventlog
+| search EventCode=4624 LogonType=10
+| stats count BY _time, host, TargetUserName, IpAddress, WorkstationName
+| sort - _time
+
+
+// // Successful RDP Logon
+
+index=windows OR index=wineventlog
+| search EventCode=4625 LogonType=10
+| stats count BY _time, host, TargetUserName, IpAddress
+| where count >= 5
+
+
+// Network Telemetry
+
+index=network OR index=firewall
+| search dest_port=3389 protocol=tcp
+| stats count BY _time, src_ip, dest_ip, user
+| sort - _time

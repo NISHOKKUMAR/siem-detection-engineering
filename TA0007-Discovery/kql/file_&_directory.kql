@@ -1,0 +1,9 @@
+event.category : "process" and
+process.name : ("cmd.exe" or "powershell.exe" or "pwsh.exe" or "bash" or "sh") and
+process.args : (
+  "*dir*" or "*ls*" or "*tree*" or "*where*" or "*find*" or "Get-ChildItem" or "gci" or "Get-Item"
+) and
+process.args : (
+  "*\\Users\\*" or "*\\AppData\\*" or "*\\ProgramData\\*" or "*\\Documents\\*" or "*Admin$*" or "*C:\\*"
+) and
+not process.parent.name : ("explorer.exe" or "cmd.exe") 

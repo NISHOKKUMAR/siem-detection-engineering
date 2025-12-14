@@ -1,0 +1,5 @@
+index=sysmon OR index=edr OR index=windows
+| where process_name="powershell.exe"
+| search CommandLine="*-enc*" OR CommandLine="*-encodedcommand*" OR CommandLine="*-nop*" OR CommandLine="*-noprofile*" OR CommandLine="*-w hidden*" OR CommandLine="*-exec bypass*" OR CommandLine="*IEX *" OR CommandLine="*DownloadString*" OR CommandLine="*DownloadFile*"
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine
+| sort - _time

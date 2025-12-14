@@ -1,0 +1,50 @@
+title: LSASS Memory Dump or Access Attempt (T1003.001)
+id: 7f991c6e-0454-4e4e-8a73-0b4a7f571003
+status: experimental
+description: Detects attempts to dump or read LSASS memory for credential harvesting.
+author: Dexter
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+tags:
+  - attack.credential_access
+  - attack.t1003.001
+  - lsass
+  - memory-dump
+
+logsource:
+  product: windows
+  category: process_access
+
+detection:
+  lsass_access:
+    TargetImage|endswith: "\\lsass.exe"
+    GrantedAccess:
+      - "0x1fffff"
+      - "0x1f0fff"
+      - "0x1010"
+      - "0x143a"
+
+  suspicious_process:
+    SourceImage|endswith:
+      - "\\procdump.exe"
+      - "\\procdump64.exe"
+      - "\\mimikatz.exe"
+      - "\\rundll32.exe"
+      - "\\powershell.exe"
+      - "\\wmic.exe"
+
+  condition: lsass_access and suspicious_process
+
+falsepositives:
+  - Antivirus or EDR diagnostic scans
+  - Legitimate use of procdump by IT admins
+
+level: critical
+
+fields:
+  - SourceImage
+  - TargetImage
+  - GrantedAccess
+  - User
+  - CallTrace
+  - Computer

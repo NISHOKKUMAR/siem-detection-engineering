@@ -1,0 +1,22 @@
+index=sysmon OR index=edr OR index=windows
+| search (process_name="rundll32.exe" OR process_name="regsvr32.exe" OR process_name="dllhost.exe")
+| search CommandLine="*.dll"
+| regex CommandLine="(?i)(Users|AppData|Temp|ProgramData|Public|Downloads)"
+| where NOT like(CommandLine, "C:\\Windows\\System32%")
+| stats count BY _time, host, user, process_name, parent_process_name, CommandLine, IntegrityLevel
+| sort - _time
+
+
+/ DLL load telemetry
+
+index=sysmon AND EventCode=7
+| regex ImageLoaded="(?i)(Users|AppData|Temp|ProgramData|Public|Downloads)"
+| where NOT like(ImageLoaded,"C:\\Windows\\System32%")
+| stats count BY _time, host, user, process_name, ImageLoaded, Signed, SignatureStatus
+
+
+/ COM hijack registry indicators
+index=sysmon OR index=windows
+| search EventCode=13 OR event_type="RegistryEvent"
+| search registry_key="HKCU\\Software\\Classes\\CLSID\\*"
+| stats count BY _time, host, user, registry_key, registry_value_data, process_name
